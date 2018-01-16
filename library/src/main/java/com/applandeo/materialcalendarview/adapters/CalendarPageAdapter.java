@@ -6,7 +6,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.applandeo.materialcalendarview.CalendarView;
 import com.applandeo.materialcalendarview.R;
 import com.applandeo.materialcalendarview.extensions.CalendarGridView;
 import com.applandeo.materialcalendarview.listeners.DayRowClickListener;
@@ -16,6 +15,8 @@ import com.applandeo.materialcalendarview.utils.SelectedDay;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+
+import static com.applandeo.materialcalendarview.CalendarView.FIRST_VISIBLE_PAGE;
 
 /**
  * This class is responsible for loading a calendar page content.
@@ -41,11 +42,6 @@ public class CalendarPageAdapter extends PagerAdapter {
     public CalendarPageAdapter(Context context, CalendarProperties calendarProperties) {
         mContext = context;
         mCalendarProperties = calendarProperties;
-
-        if (mCalendarProperties.getCalendarType() == CalendarView.ONE_DAY_PICKER
-                && mCalendarProperties.getSelectedDays().isEmpty()) {
-            mCalendarProperties.getSelectedDays().add(new SelectedDay(calendarProperties.getCurrentDate()));
-        }
     }
 
     @Override
@@ -118,6 +114,7 @@ public class CalendarPageAdapter extends PagerAdapter {
 
         // Get Calendar object instance
         Calendar calendar = (Calendar) mCalendarProperties.getCurrentDate().clone();
+        calendar.set(Calendar.MONTH, -FIRST_VISIBLE_PAGE);
 
         // Add months to Calendar (a number of months depends on ViewPager position)
         calendar.add(Calendar.MONTH, position);

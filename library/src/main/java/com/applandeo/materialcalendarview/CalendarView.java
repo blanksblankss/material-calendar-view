@@ -56,7 +56,7 @@ public class CalendarView extends LinearLayout {
     public static final int MANY_DAYS_PICKER = 2;
     public static final int RANGE_PICKER = 3;
 
-    private static final int FIRST_VISIBLE_PAGE = CALENDAR_SIZE / 2;
+    public static final int FIRST_VISIBLE_PAGE = CALENDAR_SIZE / 2;
 
     private Context mContext;
     private CalendarPageAdapter mCalendarPageAdapter;
@@ -70,13 +70,11 @@ public class CalendarView extends LinearLayout {
     public CalendarView(Context context, AttributeSet attrs) {
         super(context, attrs);
         initControl(context, attrs);
-        initCalendar();
     }
 
     public CalendarView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         initControl(context, attrs);
-        initCalendar();
     }
 
     //protected constructor to create CalendarView for the dialog date picker
@@ -198,10 +196,6 @@ public class CalendarView extends LinearLayout {
     }
 
     private void initUiElements() {
-        // This line subtracts a half of all calendar months to set calendar
-        // in the correct position (in the middle)
-        mCalendarProperties.getCurrentDate().set(Calendar.MONTH, -FIRST_VISIBLE_PAGE);
-
         ImageButton forwardButton = (ImageButton) findViewById(R.id.forwardButton);
         forwardButton.setOnClickListener(onNextClickListener);
 
@@ -221,6 +215,11 @@ public class CalendarView extends LinearLayout {
 
         // This line move calendar to the middle page
         mViewPager.setCurrentItem(FIRST_VISIBLE_PAGE);
+
+        // If calendar is one day picker, set current day selected by default
+        if (mCalendarProperties.getCalendarType() == CalendarView.ONE_DAY_PICKER) {
+            mCalendarProperties.getSelectedDays().add(new SelectedDay(DateUtils.getCalendar()));
+        }
     }
 
     public void setOnPreviousPageChangeListener(OnCalendarPageChangeListener listener) {
@@ -251,6 +250,7 @@ public class CalendarView extends LinearLayout {
         @Override
         public void onPageSelected(int position) {
             Calendar calendar = (Calendar) mCalendarProperties.getCurrentDate().clone();
+            calendar.set(Calendar.MONTH, -FIRST_VISIBLE_PAGE);
             calendar.add(Calendar.MONTH, position);
 
             if (!isScrollingLimited(calendar, position)) {
@@ -322,7 +322,6 @@ public class CalendarView extends LinearLayout {
         mCalendarProperties.getSelectedDays().add(new SelectedDay(date));
 
         mCalendarProperties.setCurrentDate(date);
-        mCalendarProperties.getCurrentDate().add(Calendar.MONTH, -FIRST_VISIBLE_PAGE);
         mCurrentMonthLabel.setText(DateUtils.getMonthAndYearDate(mContext, date));
 
         mViewPager.setCurrentItem(FIRST_VISIBLE_PAGE);
