@@ -31,7 +31,6 @@ public class CalendarProperties {
     private Drawable mPreviousButtonSrc, mForwardButtonSrc;
 
     private Calendar mCurrentDate = DateUtils.getCalendar();
-    private Calendar mSelectedDate = DateUtils.getCalendar();
     private Calendar mCalendar, mMinimumDate, mMaximumDate;
 
     private OnDayClickListener mOnDayClickListener;
@@ -42,6 +41,7 @@ public class CalendarProperties {
 
     private List<EventDay> mEventDays = new ArrayList<>();
     private List<Calendar> mDisabledDays = new ArrayList<>();
+    private List<SelectedDay> mSelectedDays = new ArrayList<>();
 
     private Context mContext;
 
@@ -197,8 +197,8 @@ public class CalendarProperties {
         return mCurrentDate;
     }
 
-    public Calendar getSelectedDate() {
-        return mSelectedDate;
+    public void setCurrentDate(Calendar date){
+        mCurrentDate = date;
     }
 
     public OnDayClickListener getOnDayClickListener() {
@@ -298,5 +298,9 @@ public class CalendarProperties {
 
     public void setAnotherMonthsDaysLabelsColor(int anotherMonthsDaysLabelsColor) {
         mAnotherMonthsDaysLabelsColor = anotherMonthsDaysLabelsColor;
+    }
+
+    public List<SelectedDay> getSelectedDays() {
+        return mSelectedDays;
     }
 }

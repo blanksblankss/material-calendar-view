@@ -31,17 +31,14 @@ import java.util.GregorianCalendar;
  */
 
 class CalendarDayAdapter extends ArrayAdapter<Date> {
-    private CalendarPageAdapter mCalendarPageAdapter;
     private LayoutInflater mLayoutInflater;
     private int mPageMonth;
     private Calendar mToday = DateUtils.getCalendar();
 
     private CalendarProperties mCalendarProperties;
 
-    CalendarDayAdapter(CalendarPageAdapter calendarPageAdapter, Context context, CalendarProperties calendarProperties,
-                       ArrayList<Date> dates, int pageMonth) {
+    CalendarDayAdapter(Context context, CalendarProperties calendarProperties, ArrayList<Date> dates, int pageMonth) {
         super(context, calendarProperties.getItemLayoutResource(), dates);
-        mCalendarPageAdapter = calendarPageAdapter;
         mCalendarProperties = calendarProperties;
         mPageMonth = pageMonth < 0 ? 11 : pageMonth;
         mLayoutInflater = LayoutInflater.from(context);
@@ -81,7 +78,7 @@ class CalendarDayAdapter extends ArrayAdapter<Date> {
 
         // Set view for all SelectedDays
         if (isSelectedDay(day)) {
-            Stream.of(mCalendarPageAdapter.getSelectedDays())
+            Stream.of(mCalendarProperties.getSelectedDays())
                     .filter(selectedDay -> selectedDay.getCalendar().equals(day))
                     .findFirst().ifPresent(selectedDay -> selectedDay.setView(dayLabel));
 
@@ -102,7 +99,7 @@ class CalendarDayAdapter extends ArrayAdapter<Date> {
 
     private boolean isSelectedDay(Calendar day) {
         return mCalendarProperties.getCalendarType() != CalendarView.CLASSIC && day.get(Calendar.MONTH) == mPageMonth
-                && mCalendarPageAdapter.getSelectedDays().contains(new SelectedDay(day));
+                && mCalendarProperties.getSelectedDays().contains(new SelectedDay(day));
     }
 
     private boolean isCurrentMonthDay(Calendar day) {

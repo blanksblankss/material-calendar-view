@@ -59,8 +59,8 @@ public class MainActivity extends AppCompatActivity implements OnSelectDateListe
                     .disabledDaysLabelsColor(android.R.color.holo_purple)
                     .previousButtonSrc(R.drawable.ic_chevron_left_black_24dp)
                     .forwardButtonSrc(R.drawable.ic_chevron_right_black_24dp)
-                    .minimumDate(min)
-                    .maximumDate(max)
+//                    .minimumDate(min)
+//                    .maximumDate(max)
                     .disabledDays(getDisabledDays());
 
             DatePicker oneDayPicker = oneDayBuilder.build();

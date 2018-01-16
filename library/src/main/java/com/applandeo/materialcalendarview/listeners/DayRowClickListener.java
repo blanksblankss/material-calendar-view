@@ -82,7 +82,7 @@ public class DayRowClickListener implements AdapterView.OnItemClickListener {
         if (isCurrentMonthDay(day) && isActiveDay(day)) {
             SelectedDay selectedDay = new SelectedDay(dayLabel, day);
 
-            if (!mCalendarPageAdapter.getSelectedDays().contains(selectedDay)) {
+            if (!mCalendarProperties.getSelectedDays().contains(selectedDay)) {
                 DayColorsUtils.setSelectedDayColors(dayLabel, mCalendarProperties);
             } else {
                 reverseUnselectedColor(selectedDay);
@@ -99,7 +99,7 @@ public class DayRowClickListener implements AdapterView.OnItemClickListener {
             return;
         }
 
-        List<SelectedDay> selectedDays = mCalendarPageAdapter.getSelectedDays();
+        List<SelectedDay> selectedDays = mCalendarProperties.getSelectedDays();
 
         if (selectedDays.size() > 1) {
             clearAndSelectOne(dayLabel, day);
@@ -115,7 +115,7 @@ public class DayRowClickListener implements AdapterView.OnItemClickListener {
     }
 
     private void clearAndSelectOne(TextView dayLabel, Calendar day) {
-        Stream.of(mCalendarPageAdapter.getSelectedDays()).forEach(this::reverseUnselectedColor);
+        Stream.of(mCalendarProperties.getSelectedDays()).forEach(this::reverseUnselectedColor);
         selectDay(dayLabel, day);
     }
 

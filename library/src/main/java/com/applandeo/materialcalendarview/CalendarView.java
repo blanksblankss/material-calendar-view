@@ -319,9 +319,9 @@ public class CalendarView extends LinearLayout {
 
         DateUtils.setMidnight(date);
 
-        mCalendarProperties.getSelectedDate().setTime(date.getTime());
+        mCalendarProperties.getSelectedDays().add(new SelectedDay(date));
 
-        mCalendarProperties.getCurrentDate().setTime(date.getTime());
+        mCalendarProperties.setCurrentDate(date);
         mCalendarProperties.getCurrentDate().add(Calendar.MONTH, -FIRST_VISIBLE_PAGE);
         mCurrentMonthLabel.setText(DateUtils.getMonthAndYearDate(mContext, date));
 
@@ -359,7 +359,7 @@ public class CalendarView extends LinearLayout {
      * @return List of Calendar object representing a selected dates
      */
     public List<Calendar> getSelectedDates() {
-        return Stream.of(mCalendarPageAdapter.getSelectedDays())
+        return Stream.of(mCalendarProperties.getSelectedDays())
                 .map(SelectedDay::getCalendar)
                 .sortBy(calendar -> calendar).toList();
     }
@@ -376,7 +376,7 @@ public class CalendarView extends LinearLayout {
      * @return Calendar object representing a selected date
      */
     public Calendar getFirstSelectedDate() {
-        return Stream.of(mCalendarPageAdapter.getSelectedDays())
+        return Stream.of(mCalendarProperties.getSelectedDays())
                 .map(SelectedDay::getCalendar).findFirst().get();
     }
 
