@@ -119,7 +119,7 @@ public class CalendarView extends LinearLayout {
         }
     }
 
-    private void initCalendarProperties(TypedArray typedArray){
+    private void initCalendarProperties(TypedArray typedArray) {
         int headerColor = typedArray.getColor(R.styleable.CalendarView_headerColor, 0);
         mCalendarProperties.setHeaderColor(headerColor);
 
@@ -318,7 +318,8 @@ public class CalendarView extends LinearLayout {
         }
 
         DateUtils.setMidnight(date);
-
+        // TODO: 16.01.2018 Trzeba znalezc lepsze rozwiazanie bo clearowanie bedzie powodowac czyszczenie zaznaczen a ma tylko scrollowac do daty i jak jest pierwszym dniem to go zaznaczac
+        mCalendarProperties.getSelectedDays().clear();
         mCalendarProperties.getSelectedDays().add(new SelectedDay(date));
 
         mCalendarProperties.setCurrentDate(date);
