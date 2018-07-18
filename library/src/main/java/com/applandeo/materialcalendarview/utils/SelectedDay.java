@@ -1,7 +1,5 @@
 package com.applandeo.materialcalendarview.utils;
 
-import android.view.View;
-
 import java.util.Calendar;
 
 /**
@@ -12,38 +10,30 @@ import java.util.Calendar;
  */
 
 public class SelectedDay {
-    private View mView;
-    private Calendar mCalendar;
+
+    private CalendarDay mCalendarDay;
+
+    public SelectedDay(CalendarDay calendarDay) {
+        mCalendarDay = calendarDay;
+    }
 
     public SelectedDay(Calendar calendar) {
-        mCalendar = calendar;
+        mCalendarDay = new CalendarDay(calendar);
     }
 
-    /**
-     * @param view     View representing selected calendar cell
-     * @param calendar Calendar instance representing selected cell date
-     */
-    public SelectedDay(View view, Calendar calendar) {
-        mView = view;
-        mCalendar = calendar;
+    public CalendarDay getCalendarDay() {
+        return mCalendarDay;
     }
 
-    /**
-     * @return View representing selected calendar cell
-     */
-    public View getView() {
-        return mView;
-    }
-
-    public void setView(View view) {
-        mView = view;
+    public void setCalendarDay(CalendarDay calendarDay) {
+        mCalendarDay = calendarDay;
     }
 
     /**
      * @return Calendar instance representing selected cell date
      */
     public Calendar getCalendar() {
-        return mCalendar;
+        return mCalendarDay.getCalendar();
     }
 
     @Override

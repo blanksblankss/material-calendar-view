@@ -2,21 +2,18 @@ package com.applandeo.materialcalendarview.listeners;
 
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.TextView;
 
 import com.annimon.stream.Stream;
 import com.applandeo.materialcalendarview.CalendarView;
 import com.applandeo.materialcalendarview.EventDay;
-import com.applandeo.materialcalendarview.R;
 import com.applandeo.materialcalendarview.adapters.CalendarPageAdapter;
+import com.applandeo.materialcalendarview.utils.CalendarDay;
 import com.applandeo.materialcalendarview.utils.CalendarProperties;
 import com.applandeo.materialcalendarview.utils.DateUtils;
 import com.applandeo.materialcalendarview.utils.DayColorsUtils;
 import com.applandeo.materialcalendarview.utils.SelectedDay;
 
 import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.List;
 
 /**
@@ -40,106 +37,103 @@ public class DayRowClickListener implements AdapterView.OnItemClickListener {
 
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-        Calendar day = new GregorianCalendar();
-        day.setTime((Date) adapterView.getItemAtPosition(position));
+        CalendarDay calendarDay = (CalendarDay) adapterView.getItemAtPosition(position);
 
         if (mCalendarProperties.getOnDayClickListener() != null) {
-            onClick(day);
+            onClick(calendarDay);
         }
 
         switch (mCalendarProperties.getCalendarType()) {
             case CalendarView.ONE_DAY_PICKER:
-                selectOneDay(view, day);
+                selectOneDay(calendarDay);
                 break;
 
             case CalendarView.MANY_DAYS_PICKER:
-                selectManyDays(view, day);
+                selectManyDays(calendarDay);
                 break;
 
             case CalendarView.RANGE_PICKER:
-                selectRange(view, day);
+                selectRange(calendarDay);
                 break;
 
             case CalendarView.CLASSIC:
-                mCalendarPageAdapter.setSelectedDay(new SelectedDay(view, day));
+                mCalendarPageAdapter.setSelectedDay(new SelectedDay(calendarDay));
         }
     }
 
-    private void selectOneDay(View view, Calendar day) {
-        SelectedDay previousSelectedDay = mCalendarPageAdapter.getSelectedDay();
+    private void selectOneDay(CalendarDay calendarDay) {
+        CalendarDay previousSelectedDay = mCalendarPageAdapter.getSelectedDay().getCalendarDay();
 
-        TextView dayLabel = (TextView) view.findViewById(R.id.dayLabel);
-
-        if (isAnotherDaySelected(previousSelectedDay, day)) {
-            selectDay(dayLabel, day);
+        if (isAnotherDaySelected(previousSelectedDay, calendarDay.getCalendar())) {
+            selectDay(calendarDay);
             reverseUnselectedColor(previousSelectedDay);
         }
     }
 
-    private void selectManyDays(View view, Calendar day) {
-        TextView dayLabel = (TextView) view.findViewById(R.id.dayLabel);
-
-        if (isCurrentMonthDay(day) && isActiveDay(day)) {
-            SelectedDay selectedDay = new SelectedDay(dayLabel, day);
+    private void selectManyDays(CalendarDay calendarDay) {
+        Calendar calendar = calendarDay.getCalendar();
+        if (isCurrentMonthDay(calendar) && isActiveDay(calendar)) {
+            SelectedDay selectedDay = new SelectedDay(calendarDay);
 
             if (!mCalendarPageAdapter.getSelectedDays().contains(selectedDay)) {
-                DayColorsUtils.setSelectedDayColors(dayLabel, mCalendarProperties);
+                DayColorsUtils.setSelectedDayColors(calendarDay.getView(), mCalendarProperties);
             } else {
-                reverseUnselectedColor(selectedDay);
+                reverseUnselectedColor(calendarDay);
             }
 
             mCalendarPageAdapter.addSelectedDay(selectedDay);
         }
     }
 
-    private void selectRange(View view, Calendar day) {
-        TextView dayLabel = (TextView) view.findViewById(R.id.dayLabel);
-
-        if (!isCurrentMonthDay(day) || !isActiveDay(day)) {
+    private void selectRange(CalendarDay calendarDay) {
+        if (!isCurrentMonthDay(calendarDay.getCalendar()) || !isActiveDay(calendarDay.getCalendar())) {
             return;
         }
 
         List<SelectedDay> selectedDays = mCalendarPageAdapter.getSelectedDays();
 
         if (selectedDays.size() > 1) {
-            clearAndSelectOne(dayLabel, day);
+            clearAndSelectOne(calendarDay);
         }
 
         if (selectedDays.size() == 1) {
-            selectOneAndRange(dayLabel, day);
+            selectOneAndRange(calendarDay);
         }
 
         if (selectedDays.isEmpty()) {
-            selectDay(dayLabel, day);
+            selectDay(calendarDay);
         }
     }
 
-    private void clearAndSelectOne(TextView dayLabel, Calendar day) {
-        Stream.of(mCalendarPageAdapter.getSelectedDays()).forEach(this::reverseUnselectedColor);
-        selectDay(dayLabel, day);
+    private void clearAndSelectOne(CalendarDay calendarDay) {
+        Stream.of(mCalendarPageAdapter.getSelectedDays())
+                .map(SelectedDay::getCalendarDay)
+                .forEach(this::reverseUnselectedColor);
+
+        selectDay(calendarDay);
     }
 
-    private void selectOneAndRange(TextView dayLabel, Calendar day) {
+    private void selectOneAndRange(CalendarDay calendarDay) {
         SelectedDay previousSelectedDay = mCalendarPageAdapter.getSelectedDay();
 
-        Stream.of(DateUtils.getDatesRange(previousSelectedDay.getCalendar(), day))
+        Stream.of(DateUtils.getDatesRange(previousSelectedDay.getCalendar(), calendarDay.getCalendar()))
                 .filter(calendar -> !mCalendarProperties.getDisabledDays().contains(calendar))
                 .forEach(calendar -> mCalendarPageAdapter.addSelectedDay(new SelectedDay(calendar)));
 
-        DayColorsUtils.setSelectedDayColors(dayLabel, mCalendarProperties);
+        DayColorsUtils.setSelectedDayColors(calendarDay.getView(), mCalendarProperties);
 
-        mCalendarPageAdapter.addSelectedDay(new SelectedDay(dayLabel, day));
+        mCalendarPageAdapter.addSelectedDay(new SelectedDay(calendarDay));
         mCalendarPageAdapter.notifyDataSetChanged();
     }
 
-    private void selectDay(TextView dayLabel, Calendar day) {
-        DayColorsUtils.setSelectedDayColors(dayLabel, mCalendarProperties);
-        mCalendarPageAdapter.setSelectedDay(new SelectedDay(dayLabel, day));
+    private void selectDay(CalendarDay calendarDay) {
+        DayColorsUtils.setSelectedDayColors(calendarDay.getView(), mCalendarProperties);
+        mCalendarPageAdapter.setSelectedDay(new SelectedDay(calendarDay));
     }
 
-    private void reverseUnselectedColor(SelectedDay selectedDay) {
-        DayColorsUtils.setCurrentMonthDayColors(selectedDay.getCalendar(),
-                DateUtils.getCalendar(), (TextView) selectedDay.getView(), mCalendarProperties);
+    private void reverseUnselectedColor(CalendarDay calendarDay) {
+        DayColorsUtils.setCurrentMonthDayColors(calendarDay.getCalendar(),
+                DateUtils.getCalendar(), calendarDay.getView(), mCalendarProperties);
     }
 
     private boolean isCurrentMonthDay(Calendar day) {
@@ -155,25 +149,25 @@ public class DayRowClickListener implements AdapterView.OnItemClickListener {
                 || (mCalendarProperties.getMaximumDate() != null && day.after(mCalendarProperties.getMaximumDate())));
     }
 
-    private boolean isAnotherDaySelected(SelectedDay selectedDay, Calendar day) {
-        return selectedDay != null && !day.equals(selectedDay.getCalendar())
-                && isCurrentMonthDay(day) && isActiveDay(day);
+    private boolean isAnotherDaySelected(CalendarDay previousSelectedDay, Calendar calendar) {
+        return previousSelectedDay != null && !calendar.equals(previousSelectedDay.getCalendar())
+                && isCurrentMonthDay(calendar) && isActiveDay(calendar);
     }
 
-    private void onClick(Calendar day) {
+    private void onClick(CalendarDay calendarDay) {
         if (mCalendarProperties.getEventDays() == null) {
-            createEmptyEventDay(day);
+            createEmptyEventDay(calendarDay);
             return;
         }
 
         Stream.of(mCalendarProperties.getEventDays())
-                .filter(eventDate -> eventDate.getCalendar().equals(day))
+                .filter(eventDate -> eventDate.getCalendar().equals(calendarDay.getCalendar()))
                 .findFirst()
-                .ifPresentOrElse(this::callOnClickListener, () -> createEmptyEventDay(day));
+                .ifPresentOrElse(this::callOnClickListener, () -> createEmptyEventDay(calendarDay));
     }
 
-    private void createEmptyEventDay(Calendar day) {
-        EventDay eventDay = new EventDay(day);
+    private void createEmptyEventDay(CalendarDay calendarDay) {
+        EventDay eventDay = new EventDay(calendarDay.getCalendar());
         callOnClickListener(eventDay);
     }
 

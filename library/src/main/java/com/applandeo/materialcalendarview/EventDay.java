@@ -1,6 +1,7 @@
 package com.applandeo.materialcalendarview;
 
 import android.support.annotation.RestrictTo;
+import android.view.View;
 
 import com.applandeo.materialcalendarview.utils.DateUtils;
 
@@ -18,6 +19,7 @@ public class EventDay {
     private Calendar mDay;
     private int mImageResource;
     private boolean mIsDisabled;
+    private boolean mIsSelected;
 
     /**
      * @param day Calendar object which represents a date of the event
@@ -64,5 +66,13 @@ public class EventDay {
     @RestrictTo(RestrictTo.Scope.LIBRARY)
     public void setEnabled(boolean enabled) {
         mIsDisabled = enabled;
+    }
+
+    public boolean isSelected() {
+        return mIsSelected;
+    }
+
+    public void setSelected(boolean selected) {
+        mIsSelected = selected;
     }
 }

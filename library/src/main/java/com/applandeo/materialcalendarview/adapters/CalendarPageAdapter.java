@@ -10,12 +10,12 @@ import com.applandeo.materialcalendarview.CalendarView;
 import com.applandeo.materialcalendarview.R;
 import com.applandeo.materialcalendarview.extensions.CalendarGridView;
 import com.applandeo.materialcalendarview.listeners.DayRowClickListener;
+import com.applandeo.materialcalendarview.utils.CalendarDay;
 import com.applandeo.materialcalendarview.utils.CalendarProperties;
 import com.applandeo.materialcalendarview.utils.SelectedDay;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 
 import static com.applandeo.materialcalendarview.utils.CalendarProperties.CALENDAR_SIZE;
@@ -34,6 +34,7 @@ public class CalendarPageAdapter extends PagerAdapter {
     private CalendarProperties mCalendarProperties;
 
     private int mPageMonth;
+    private CalendarDayAdapter mCalendarDayAdapter;
 
     public CalendarPageAdapter(Context context, CalendarProperties calendarProperties) {
         mContext = context;
@@ -113,7 +114,7 @@ public class CalendarPageAdapter extends PagerAdapter {
      * @param position Position of current page in ViewPager
      */
     private void loadMonth(int position) {
-        ArrayList<Date> days = new ArrayList<>();
+        ArrayList<CalendarDay> days = new ArrayList<>();
 
         // Get Calendar object instance
         Calendar calendar = (Calendar) mCalendarProperties.getFirstPageCalendarDate().clone();
@@ -139,15 +140,15 @@ public class CalendarPageAdapter extends PagerAdapter {
         (a part of previous month, current month and a part of next month))
          */
         while (days.size() < 42) {
-            days.add(calendar.getTime());
+            days.add(new CalendarDay(calendar));
             calendar.add(Calendar.DAY_OF_MONTH, 1);
         }
 
         mPageMonth = calendar.get(Calendar.MONTH) - 1;
-        CalendarDayAdapter calendarDayAdapter = new CalendarDayAdapter(this, mContext,
+        mCalendarDayAdapter = new CalendarDayAdapter(this, mContext,
                 mCalendarProperties, days, mPageMonth);
 
-        mCalendarGridView.setAdapter(calendarDayAdapter);
+        mCalendarGridView.setAdapter(mCalendarDayAdapter);
     }
 
     @Override

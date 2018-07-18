@@ -13,6 +13,7 @@ import android.widget.TextView;
 import com.annimon.stream.Stream;
 import com.applandeo.materialcalendarview.CalendarView;
 import com.applandeo.materialcalendarview.R;
+import com.applandeo.materialcalendarview.utils.CalendarDay;
 import com.applandeo.materialcalendarview.utils.CalendarProperties;
 import com.applandeo.materialcalendarview.utils.DateUtils;
 import com.applandeo.materialcalendarview.utils.DayColorsUtils;
@@ -21,8 +22,6 @@ import com.applandeo.materialcalendarview.utils.SelectedDay;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
 
 /**
  * This class is responsible for loading a one day cell.
@@ -30,7 +29,7 @@ import java.util.GregorianCalendar;
  * Created by Mateusz Kornakiewicz on 24.05.2017.
  */
 
-class CalendarDayAdapter extends ArrayAdapter<Date> {
+class CalendarDayAdapter extends ArrayAdapter<CalendarDay> {
     private CalendarPageAdapter mCalendarPageAdapter;
     private LayoutInflater mLayoutInflater;
     private int mPageMonth;
@@ -39,8 +38,8 @@ class CalendarDayAdapter extends ArrayAdapter<Date> {
     private CalendarProperties mCalendarProperties;
 
     CalendarDayAdapter(CalendarPageAdapter calendarPageAdapter, Context context, CalendarProperties calendarProperties,
-                       ArrayList<Date> dates, int pageMonth) {
-        super(context, calendarProperties.getItemLayoutResource(), dates);
+                       ArrayList<CalendarDay> calendarDays, int pageMonth) {
+        super(context, calendarProperties.getItemLayoutResource(), calendarDays);
         mCalendarPageAdapter = calendarPageAdapter;
         mCalendarProperties = calendarProperties;
         mPageMonth = pageMonth < 0 ? 11 : pageMonth;
@@ -54,55 +53,60 @@ class CalendarDayAdapter extends ArrayAdapter<Date> {
             view = mLayoutInflater.inflate(mCalendarProperties.getItemLayoutResource(), parent, false);
         }
 
+        CalendarDay calendarDay = getItem(position);
+
         TextView dayLabel = (TextView) view.findViewById(R.id.dayLabel);
+        calendarDay.setView(dayLabel);
+
         ImageView dayIcon = (ImageView) view.findViewById(R.id.dayIcon);
 
-        Calendar day = new GregorianCalendar();
-        day.setTime(getItem(position));
+        Calendar day = calendarDay.getCalendar();
 
         // Loading an image of the event
         if (dayIcon != null) {
             loadIcon(dayIcon, day);
         }
 
-        setLabelColors(dayLabel, day);
+        setLabelColors(calendarDay);
 
         dayLabel.setText(String.valueOf(day.get(Calendar.DAY_OF_MONTH)));
         return view;
     }
 
-    private void setLabelColors(TextView dayLabel, Calendar day) {
+    private void setLabelColors(CalendarDay calendarDay) {
         // Setting not current month day color
-        if (!isCurrentMonthDay(day)) {
-            DayColorsUtils.setDayColors(dayLabel, mCalendarProperties.getAnotherMonthsDaysLabelsColor(),
+        if (!isCurrentMonthDay(calendarDay.getCalendar())) {
+            DayColorsUtils.setDayColors(calendarDay.getView(), mCalendarProperties.getAnotherMonthsDaysLabelsColor(),
                     Typeface.NORMAL, R.drawable.background_transparent);
             return;
         }
 
-        // Set view for all SelectedDays
-        if (isSelectedDay(day)) {
+        // Set view for all SelectedDays without view
+        if (isSelectedDay(calendarDay)) {
             Stream.of(mCalendarPageAdapter.getSelectedDays())
-                    .filter(selectedDay -> selectedDay.getCalendar().equals(day))
-                    .findFirst().ifPresent(selectedDay -> selectedDay.setView(dayLabel));
+//                    .filter(selectedDay -> selectedDay.getCalendarDay().getView() == null)
+                    .filter(selectedDay -> selectedDay.getCalendar().equals(calendarDay.getCalendar()))
+                    .findFirst().ifPresent(selectedDay -> selectedDay.setCalendarDay(calendarDay));
 
-            DayColorsUtils.setSelectedDayColors(dayLabel, mCalendarProperties);
+            DayColorsUtils.setSelectedDayColors(calendarDay.getView(), mCalendarProperties);
             return;
         }
 
         // Setting disabled days color
-        if (!isActiveDay(day)) {
-            DayColorsUtils.setDayColors(dayLabel, mCalendarProperties.getDisabledDaysLabelsColor(),
+        if (!isActiveDay(calendarDay.getCalendar())) {
+            DayColorsUtils.setDayColors(calendarDay.getView(), mCalendarProperties.getDisabledDaysLabelsColor(),
                     Typeface.NORMAL, R.drawable.background_transparent);
             return;
         }
 
         // Setting current month day color
-        DayColorsUtils.setCurrentMonthDayColors(day, mToday, dayLabel, mCalendarProperties);
+        DayColorsUtils.setCurrentMonthDayColors(calendarDay.getCalendar(), mToday, calendarDay.getView(), mCalendarProperties);
     }
 
-    private boolean isSelectedDay(Calendar day) {
-        return mCalendarProperties.getCalendarType() != CalendarView.CLASSIC && day.get(Calendar.MONTH) == mPageMonth
-                && mCalendarPageAdapter.getSelectedDays().contains(new SelectedDay(day));
+    private boolean isSelectedDay(CalendarDay calendarDay) {
+        return mCalendarProperties.getCalendarType() != CalendarView.CLASSIC
+                && calendarDay.getCalendar().get(Calendar.MONTH) == mPageMonth
+                && mCalendarPageAdapter.getSelectedDays().contains(new SelectedDay(calendarDay));
     }
 
     private boolean isCurrentMonthDay(Calendar day) {

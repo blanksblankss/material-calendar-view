@@ -423,6 +423,7 @@ public class CalendarView extends LinearLayout {
                 - DateUtils.getMonthsBetweenDates(DateUtils.getCalendar(), getCurrentPageDate()), true);
     }
 
+    // TODO: 18.07.2018 Zrobic deprecated
     public void setDisabledDays(List<Calendar> disabledDays) {
         mCalendarProperties.setDisabledDays(disabledDays);
     }
