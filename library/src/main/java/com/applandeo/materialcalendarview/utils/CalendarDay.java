@@ -12,6 +12,7 @@ public class CalendarDay {
 
     private Calendar mCalendar;
     private TextView mView;
+    private boolean mIsSelected;
 
     public CalendarDay(Calendar calendar) {
         mCalendar = (Calendar) calendar.clone();
@@ -33,5 +34,22 @@ public class CalendarDay {
      */
     public TextView getView() {
         return mView;
+    }
+
+    public boolean isSelected() {
+        return mIsSelected;
+    }
+
+    public void setSelected(boolean selected) {
+        mIsSelected = selected;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof CalendarDay) {
+            return getCalendar().equals(((CalendarDay) obj).getCalendar());
+        }
+
+        return super.equals(obj);
     }
 }

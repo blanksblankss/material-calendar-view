@@ -18,7 +18,6 @@ import com.applandeo.materialcalendarview.utils.CalendarProperties;
 import com.applandeo.materialcalendarview.utils.DateUtils;
 import com.applandeo.materialcalendarview.utils.DayColorsUtils;
 import com.applandeo.materialcalendarview.utils.ImageUtils;
-import com.applandeo.materialcalendarview.utils.SelectedDay;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -81,13 +80,9 @@ class CalendarDayAdapter extends ArrayAdapter<CalendarDay> {
             return;
         }
 
-        // Set view for all SelectedDays without view
+        // Update view for all selected CalendarDays
         if (isSelectedDay(calendarDay)) {
-            Stream.of(mCalendarPageAdapter.getSelectedDays())
-//                    .filter(selectedDay -> selectedDay.getCalendarDay().getView() == null)
-                    .filter(selectedDay -> selectedDay.getCalendar().equals(calendarDay.getCalendar()))
-                    .findFirst().ifPresent(selectedDay -> selectedDay.setCalendarDay(calendarDay));
-
+            updateViewVariable(calendarDay);
             DayColorsUtils.setSelectedDayColors(calendarDay.getView(), mCalendarProperties);
             return;
         }
@@ -106,7 +101,16 @@ class CalendarDayAdapter extends ArrayAdapter<CalendarDay> {
     private boolean isSelectedDay(CalendarDay calendarDay) {
         return mCalendarProperties.getCalendarType() != CalendarView.CLASSIC
                 && calendarDay.getCalendar().get(Calendar.MONTH) == mPageMonth
-                && mCalendarPageAdapter.getSelectedDays().contains(new SelectedDay(calendarDay));
+                && mCalendarProperties.getCalendarDaysWithAction().contains(calendarDay);
+    }
+
+    /**
+     * This methods updates View variable in CalendarDay with new one after view reloading
+     */
+    private void updateViewVariable(CalendarDay calendarDay) {
+        Stream.of(mCalendarProperties.getCalendarDaysWithAction())
+                .filter(day -> day.equals(calendarDay))
+                .findFirst().ifPresent(selectedDay -> selectedDay.setView(calendarDay.getView()));
     }
 
     private boolean isCurrentMonthDay(Calendar day) {
@@ -125,8 +129,9 @@ class CalendarDayAdapter extends ArrayAdapter<CalendarDay> {
             return;
         }
 
-        Stream.of(mCalendarProperties.getEventDays()).filter(eventDate ->
-                eventDate.getCalendar().equals(day)).findFirst().executeIfPresent(eventDay -> {
+        Stream.of(mCalendarProperties.getEventDays())
+                .filter(eventDate -> eventDate.getCalendar().equals(day))
+                .findFirst().executeIfPresent(eventDay -> {
 
             ImageUtils.loadResource(dayIcon, eventDay.getImageResource());
 
@@ -134,7 +139,6 @@ class CalendarDayAdapter extends ArrayAdapter<CalendarDay> {
             if (!isCurrentMonthDay(day) || !isActiveDay(day)) {
                 dayIcon.setAlpha(0.12f);
             }
-
         });
     }
 }

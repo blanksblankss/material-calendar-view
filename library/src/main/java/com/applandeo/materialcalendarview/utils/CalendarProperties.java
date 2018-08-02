@@ -41,7 +41,7 @@ public class CalendarProperties {
     private Drawable mPreviousButtonSrc, mForwardButtonSrc;
 
     private Calendar mFirstPageCalendarDate = DateUtils.getCalendar();
-    private Calendar mSelectedDate = DateUtils.getCalendar();
+//    private Calendar mSelectedDate = DateUtils.getCalendar();
     private Calendar mCalendar, mMinimumDate, mMaximumDate;
 
     private OnDayClickListener mOnDayClickListener;
@@ -52,7 +52,17 @@ public class CalendarProperties {
 
     private List<EventDay> mEventDays = new ArrayList<>();
     private List<Calendar> mDisabledDays = new ArrayList<>();
-    private List<SelectedDay> mSelectedDays = new ArrayList<>();
+//    private List<SelectedDay> mSelectedDays = new ArrayList<>();
+
+    public List<CalendarDay> getCalendarDaysWithAction() {
+        return mCalendarDaysWithAction;
+    }
+
+    public void setCalendarDaysWithAction(List<CalendarDay> calendarDaysWithAction) {
+        mCalendarDaysWithAction = calendarDaysWithAction;
+    }
+
+    private List<CalendarDay> mCalendarDaysWithAction = new ArrayList<>();
 
     private Context mContext;
 
@@ -216,9 +226,9 @@ public class CalendarProperties {
         return mFirstPageCalendarDate;
     }
 
-    public Calendar getSelectedDate() {
-        return mSelectedDate;
-    }
+//    public Calendar getSelectedDate() {
+//        return mSelectedDate;
+//    }
 
     public OnDayClickListener getOnDayClickListener() {
         return mOnDayClickListener;
@@ -247,15 +257,15 @@ public class CalendarProperties {
         }).toList();
     }
 
-    public List<SelectedDay> getSelectedDays() {
-        return mSelectedDays;
-    }
+//    public List<SelectedDay> getSelectedDays() {
+//        return mSelectedDays;
+//    }
 
     public void setSelectedDays(List<Calendar> selectedDays) {
-        mSelectedDays = Stream.of(selectedDays).map(calendar -> {
-            DateUtils.setMidnight(calendar);
-            return new SelectedDay(calendar);
-        }).toList();
+//        mSelectedDays = Stream.of(selectedDays).map(calendar -> {
+//            DateUtils.setMidnight(calendar);
+//            return new SelectedDay(calendar);
+//        }).toList();
     }
 
     public int getDisabledDaysLabelsColor() {

@@ -6,17 +6,16 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.annimon.stream.Stream;
 import com.applandeo.materialcalendarview.CalendarView;
 import com.applandeo.materialcalendarview.R;
 import com.applandeo.materialcalendarview.extensions.CalendarGridView;
 import com.applandeo.materialcalendarview.listeners.DayRowClickListener;
 import com.applandeo.materialcalendarview.utils.CalendarDay;
 import com.applandeo.materialcalendarview.utils.CalendarProperties;
-import com.applandeo.materialcalendarview.utils.SelectedDay;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.List;
 
 import static com.applandeo.materialcalendarview.utils.CalendarProperties.CALENDAR_SIZE;
 
@@ -41,7 +40,7 @@ public class CalendarPageAdapter extends PagerAdapter {
         mCalendarProperties = calendarProperties;
 
         if (mCalendarProperties.getCalendarType() == CalendarView.ONE_DAY_PICKER) {
-            addSelectedDay(new SelectedDay(calendarProperties.getSelectedDate()));
+//            addSelectedDay(new SelectedDay(calendarProperties.getSelectedDate()));
         }
     }
 
@@ -67,44 +66,46 @@ public class CalendarPageAdapter extends PagerAdapter {
 
         loadMonth(position);
 
-        mCalendarGridView.setOnItemClickListener(new DayRowClickListener(this,
-                mCalendarProperties, mPageMonth));
+        DayRowClickListener listener = new DayRowClickListener(this, mCalendarProperties, mPageMonth);
+        mCalendarGridView.setOnItemClickListener(listener);
 
         container.addView(mCalendarGridView);
         return mCalendarGridView;
     }
 
-    public void addSelectedDay(SelectedDay selectedDay) {
-        if (!mCalendarProperties.getSelectedDays().contains(selectedDay)) {
-            mCalendarProperties.getSelectedDays().add(selectedDay);
-            informDatePicker();
-            return;
-        }
+//    public void addSelectedDay(CalendarDay calendarDay) {
+//        if (!mCalendarProperties.getSelectedDays().contains(selectedDay)) {
+//            mCalendarProperties.getSelectedDays().add(selectedDay);
+//            informDatePicker();
+//            return;
+//        }
+//
+//        mCalendarProperties.getSelectedDays().remove(selectedDay);
+//        informDatePicker();
+//    }
 
-        mCalendarProperties.getSelectedDays().remove(selectedDay);
-        informDatePicker();
-    }
+//    public List<CalendarDay> getSelectedDays() {
+//        return mCalendarProperties.getCalendarDaysWithAction();
+//    }
 
-    public List<SelectedDay> getSelectedDays() {
-        return mCalendarProperties.getSelectedDays();
-    }
+//    public SelectedDay getSelectedDay() {
+//        return mCalendarProperties.getSelectedDays().get(0);
+//    }
 
-    public SelectedDay getSelectedDay() {
-        return mCalendarProperties.getSelectedDays().get(0);
-    }
-
-    public void setSelectedDay(SelectedDay selectedDay) {
-        mCalendarProperties.getSelectedDays().clear();
-        mCalendarProperties.getSelectedDays().add(selectedDay);
-        informDatePicker();
-    }
+//    public void setSelectedDay(SelectedDay selectedDay) {
+//        mCalendarProperties.getSelectedDays().clear();
+//        mCalendarProperties.getSelectedDays().add(selectedDay);
+//        informDatePicker();
+//    }
 
     /**
      * This method inform DatePicker about ability to return selected days
      */
-    private void informDatePicker() {
+    public void informDatePicker() {
         if (mCalendarProperties.getOnSelectionAbilityListener() != null) {
-            mCalendarProperties.getOnSelectionAbilityListener().onChange(mCalendarProperties.getSelectedDays().size() > 0);
+            int selectedDays = Stream.of(mCalendarProperties.getCalendarDaysWithAction())
+                    .filter(CalendarDay::isSelected).toList().size();
+            mCalendarProperties.getOnSelectionAbilityListener().onChange(selectedDays > 0);
         }
     }
 

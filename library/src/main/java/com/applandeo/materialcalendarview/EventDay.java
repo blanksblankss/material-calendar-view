@@ -1,7 +1,6 @@
 package com.applandeo.materialcalendarview;
 
 import android.support.annotation.RestrictTo;
-import android.view.View;
 
 import com.applandeo.materialcalendarview.utils.DateUtils;
 

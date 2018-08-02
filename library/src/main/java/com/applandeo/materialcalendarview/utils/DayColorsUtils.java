@@ -71,4 +71,9 @@ public class DayColorsUtils {
                     R.drawable.background_transparent);
         }
     }
+
+    public static void reverseUnselectedColor(CalendarDay calendarDay, CalendarProperties calendarProperties) {
+        setCurrentMonthDayColors(calendarDay.getCalendar(),
+                DateUtils.getCalendar(), calendarDay.getView(), calendarProperties);
+    }
 }

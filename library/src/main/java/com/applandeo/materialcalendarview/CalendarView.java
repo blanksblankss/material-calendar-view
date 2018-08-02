@@ -17,9 +17,9 @@ import com.applandeo.materialcalendarview.extensions.CalendarViewPager;
 import com.applandeo.materialcalendarview.listeners.OnCalendarPageChangeListener;
 import com.applandeo.materialcalendarview.listeners.OnDayClickListener;
 import com.applandeo.materialcalendarview.utils.AppearanceUtils;
+import com.applandeo.materialcalendarview.utils.CalendarDay;
 import com.applandeo.materialcalendarview.utils.CalendarProperties;
 import com.applandeo.materialcalendarview.utils.DateUtils;
-import com.applandeo.materialcalendarview.utils.SelectedDay;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -323,7 +323,7 @@ public class CalendarView extends LinearLayout {
         if (mCalendarProperties.getMaximumDate() != null && date.after(mCalendarProperties.getMaximumDate())) {
             throw new OutOfDateRangeException("SET DATE EXCEEDS THE MAXIMUM DATE");
         }
-        mCalendarProperties.getSelectedDate().setTime(date.getTime());
+//        mCalendarProperties.getSelectedDate().setTime(date.getTime());
 
         setUpCalendarPosition(date);
 
@@ -361,8 +361,9 @@ public class CalendarView extends LinearLayout {
      * @return List of Calendar object representing a selected dates
      */
     public List<Calendar> getSelectedDates() {
-        return Stream.of(mCalendarPageAdapter.getSelectedDays())
-                .map(SelectedDay::getCalendar)
+        return Stream.of(mCalendarProperties.getCalendarDaysWithAction())
+                .filter(CalendarDay::isSelected)
+                .map(CalendarDay::getCalendar)
                 .sortBy(calendar -> calendar).toList();
     }
 
@@ -383,8 +384,10 @@ public class CalendarView extends LinearLayout {
      * @return Calendar object representing a selected date
      */
     public Calendar getFirstSelectedDate() {
-        return Stream.of(mCalendarPageAdapter.getSelectedDays())
-                .map(SelectedDay::getCalendar).findFirst().get();
+//        return Stream.of(mCalendarPageAdapter.getSelectedDays())
+//                .map(SelectedDay::getCalendar).findFirst().get();
+
+        return null;
     }
 
     /**
